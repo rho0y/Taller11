@@ -4,7 +4,7 @@
 
 int main()
 {
-    DatosLibroAnidado coleccion[MAX_LIBROS];
+    struct DatosLibroAnidado coleccion[MAX_LIBROS];
     int totalLibros = 0;
     int opcion;
 
@@ -21,43 +21,64 @@ int main()
         }
         getchar();
 
-        switch (opcion)
+        if (opcion == 1)
         {
-        case 1:
             registrarLibros(coleccion, &totalLibros);
-            break;
-        case 2:
+        }
+        else if (opcion == 2)
+        {
             listaLibros(coleccion, totalLibros);
-            break;
-        case 3:
+        }
+        else if (opcion == 3)
+        {
             buscarLibro(coleccion, totalLibros);
-            break;
-        case 4:
+        }
+        else if (opcion == 4)
+        {
             actualizarEstadoLibro(coleccion, totalLibros);
-            break;
-        case 5:
+        }
+        else if (opcion == 5)
+        {
             if (totalLibros <= 0)
             {
                 printf("No hay libros registrados para eliminar.\n");
-                break;
             }
-            listaLibros(coleccion, totalLibros);
-            int indice;
-            printf("Ingrese el indice del libro a eliminar entre 1 y %d: ", totalLibros);
-            if (scanf("%d", &indice) != 1 || indice < 1 || indice > totalLibros)
+            else
             {
-                printf("Indice invalido. Por favor ingresa un numero entre 1 y %d.\n", totalLibros);
-                while (getchar() != '\n')
-                    ;
-                break;
+                listaLibros(coleccion, totalLibros);
+                int indice;
+                printf("Ingrese el indice del libro a eliminar entre 1 y %d: ", totalLibros);
+                if (scanf("%d", &indice) != 1)
+                {
+                    printf("Indice invalido. Por favor ingresa un numero entre 1 y %d.\n", totalLibros);
+                    while (getchar() != '\n')
+                        ;
+                }
+                else if (indice < 1)
+                {
+                    printf("Indice invalido. Por favor ingresa un numero entre 1 y %d.\n", totalLibros);
+                    while (getchar() != '\n')
+                        ;
+                }
+                else if (indice > totalLibros)
+                {
+                    printf("Indice invalido. Por favor ingresa un numero entre 1 y %d.\n", totalLibros);
+                    while (getchar() != '\n')
+                        ;
+                }
+                else
+                {
+                    getchar();
+                    eliminarLibro(coleccion, &totalLibros, indice - 1);
+                }
             }
-            getchar();
-            eliminarLibro(coleccion, &totalLibros, indice - 1);
-            break;
-        case 6:
+        }
+        else if (opcion == 6)
+        {
             printf("Gracias por usar el sistema de biblioteca. Hasta luego!\n");
-            break;
-        default:
+        }
+        else
+        {
             printf("Opcion invalida. Por favor selecciona una opcion del menu.\n");
         }
 
