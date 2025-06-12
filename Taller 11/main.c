@@ -4,7 +4,7 @@
 
 int main()
 {
-    Datoslibro coleccion[MAX_LIBROS];
+    DatosLibroAnidado coleccion[MAX_LIBROS];
     int totalLibros = 0;
     int opcion;
 
@@ -15,7 +15,8 @@ int main()
         if (scanf("%d", &opcion) != 1)
         {
             printf("Entrada invalida. Por favor ingresa un numero.\n");
-            while (getchar() != '\n');
+            while (getchar() != '\n')
+                ;
             continue;
         }
         getchar();
@@ -40,21 +41,21 @@ int main()
                 printf("No hay libros registrados para eliminar.\n");
                 break;
             }
-
             listaLibros(coleccion, totalLibros);
             int indice;
-            printf("Ingrese el indice del libro a eliminar (1 a %d): ", totalLibros);
+            printf("Ingrese el indice del libro a eliminar entre 1 y %d: ", totalLibros);
             if (scanf("%d", &indice) != 1 || indice < 1 || indice > totalLibros)
             {
                 printf("Indice invalido. Por favor ingresa un numero entre 1 y %d.\n", totalLibros);
-                while (getchar() != '\n');
+                while (getchar() != '\n')
+                    ;
                 break;
             }
             getchar();
             eliminarLibro(coleccion, &totalLibros, indice - 1);
             break;
         case 6:
-            printf("Saliendo...\n");
+            printf("Gracias por usar el sistema de biblioteca. Hasta luego!\n");
             break;
         default:
             printf("Opcion invalida. Por favor selecciona una opcion del menu.\n");
