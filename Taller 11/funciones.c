@@ -13,7 +13,7 @@ void menu()
     printf("6. Salir\n");
 }
 
-int idExiste(DatosLibroAnidado coleccion[], int totalLibros, const char *id)
+int idExiste(struct DatosLibroAnidado coleccion[], int totalLibros, const char *id)
 {
     for (int i = 0; i < totalLibros; i++)
     {
@@ -25,11 +25,32 @@ int idExiste(DatosLibroAnidado coleccion[], int totalLibros, const char *id)
     return 0;
 }
 
-void registrarLibros(DatosLibroAnidado coleccion[], int *totalLibros)
+int validarCadenaVacia(const char *cadena)
+{
+    int i = 0;
+    while (cadena[i] != '\0')
+    {
+        if (cadena[i] != ' ' && cadena[i] != '\t' && cadena[i] != '\n')
+        {
+            return 1;
+        }
+        i++;
+    }
+    return 0;
+}
+
+void registrarLibros(struct DatosLibroAnidado coleccion[], int *totalLibros)
 {
     int n;
     printf("Cuantos libros deseas registrar? ");
-    if (scanf("%d", &n) != 1 || n <= 0)
+    if (scanf("%d", &n) != 1)
+    {
+        printf("Entrada invalida. Debes ingresar un numero positivo.\n");
+        while (getchar() != '\n')
+            ;
+        return;
+    }
+    else if (n <= 0)
     {
         printf("Entrada invalida. Debes ingresar un numero positivo.\n");
         while (getchar() != '\n')
@@ -48,90 +69,117 @@ void registrarLibros(DatosLibroAnidado coleccion[], int *totalLibros)
         printf("\n=== REGISTRANDO LIBRO #%d ===\n", *totalLibros + 1);
 
         int idValido = 0;
-        while (!idValido)
+        while (idValido == 0)
         {
             printf("ID del libro: ");
             getchar();
-            fgets(coleccion[*totalLibros].ID, sizeof(coleccion[*totalLibros].ID), stdin);
-            strtok(coleccion[*totalLibros].ID, "\n");
-
-            if (!idExiste(coleccion, *totalLibros, coleccion[*totalLibros].ID))
+            fgets(coleccion[*totalLibros].ID, MAX_ID, stdin);
+            int len = strlen(coleccion[*totalLibros].ID);
+            if (len > 0 && coleccion[*totalLibros].ID[len - 1] == '\n')
             {
-                idValido = 1;
+                coleccion[*totalLibros].ID[len - 1] = '\0';
+            }
+
+            if (validarCadenaVacia(coleccion[*totalLibros].ID) == 0)
+            {
+                printf("Error: El ID no puede estar vacio.\n");
+            }
+            else if (idExiste(coleccion, *totalLibros, coleccion[*totalLibros].ID) == 1)
+            {
+                printf("El ID ya existe. Ingresa un ID unico.\n");
             }
             else
             {
-                printf("El ID ya existe. Ingresa un ID unico.\n");
+                idValido = 1;
             }
         }
 
         printf("\n--- INFORMACION BASICA ---\n");
-        printf("Titulo: ");
-        fgets(coleccion[*totalLibros].titulo, sizeof(coleccion[*totalLibros].titulo), stdin);
-        strtok(coleccion[*totalLibros].titulo, "\n");
 
-        printf("Numero de paginas: ");
-        scanf("%d", &coleccion[*totalLibros].numeroPaginas);
-        getchar();
+        int tituloValido = 0;
+        while (tituloValido == 0)
+        {
+            printf("Titulo: ");
+            fgets(coleccion[*totalLibros].titulo, MAX_TITULOS, stdin);
+            int len = strlen(coleccion[*totalLibros].titulo);
+            if (len > 0 && coleccion[*totalLibros].titulo[len - 1] == '\n')
+            {
+                coleccion[*totalLibros].titulo[len - 1] = '\0';
+            }
 
-        printf("Idioma: ");
-        fgets(coleccion[*totalLibros].idioma, sizeof(coleccion[*totalLibros].idioma), stdin);
-        strtok(coleccion[*totalLibros].idioma, "\n");
+            if (validarCadenaVacia(coleccion[*totalLibros].titulo) == 0)
+            {
+                printf("Error: El titulo no puede estar vacio.\n");
+            }
+            else
+            {
+                tituloValido = 1;
+            }
+        }
+
+        int idiomaValido = 0;
+        while (idiomaValido == 0)
+        {
+            printf("Idioma: ");
+            fgets(coleccion[*totalLibros].idioma, 20, stdin);
+            int len = strlen(coleccion[*totalLibros].idioma);
+            if (len > 0 && coleccion[*totalLibros].idioma[len - 1] == '\n')
+            {
+                coleccion[*totalLibros].idioma[len - 1] = '\0';
+            }
+
+            if (validarCadenaVacia(coleccion[*totalLibros].idioma) == 0)
+            {
+                printf("Error: El idioma no puede estar vacio.\n");
+            }
+            else
+            {
+                idiomaValido = 1;
+            }
+        }
+
+        int generoValido = 0;
+        while (generoValido == 0)
+        {
+            printf("Genero: ");
+            fgets(coleccion[*totalLibros].genero, 30, stdin);
+            int len = strlen(coleccion[*totalLibros].genero);
+            if (len > 0 && coleccion[*totalLibros].genero[len - 1] == '\n')
+            {
+                coleccion[*totalLibros].genero[len - 1] = '\0';
+            }
+
+            if (validarCadenaVacia(coleccion[*totalLibros].genero) == 0)
+            {
+                printf("Error: El genero no puede estar vacio.\n");
+            }
+            else
+            {
+                generoValido = 1;
+            }
+        }
 
         printf("\n--- INFORMACION DEL AUTOR ---\n");
-        printf("Nombre del autor: ");
-        fgets(coleccion[*totalLibros].autor.nombre, sizeof(coleccion[*totalLibros].autor.nombre), stdin);
-        strtok(coleccion[*totalLibros].autor.nombre, "\n");
+        int autorValido = 0;
+        while (autorValido == 0)
+        {
+            printf("Nombre completo del autor: ");
+            fgets(coleccion[*totalLibros].autor.nombreCompleto, 100, stdin);
+            int len = strlen(coleccion[*totalLibros].autor.nombreCompleto);
+            if (len > 0 && coleccion[*totalLibros].autor.nombreCompleto[len - 1] == '\n')
+            {
+                coleccion[*totalLibros].autor.nombreCompleto[len - 1] = '\0';
+            }
 
-        printf("Apellido del autor: ");
-        fgets(coleccion[*totalLibros].autor.apellido, sizeof(coleccion[*totalLibros].autor.apellido), stdin);
-        strtok(coleccion[*totalLibros].autor.apellido, "\n");
-
-        printf("Nacionalidad del autor: ");
-        fgets(coleccion[*totalLibros].autor.nacionalidad, sizeof(coleccion[*totalLibros].autor.nacionalidad), stdin);
-        strtok(coleccion[*totalLibros].autor.nacionalidad, "\n");
-
-        printf("Edad del autor: ");
-        scanf("%d", &coleccion[*totalLibros].autor.edad);
-        getchar();
-
-        printf("\n--- INFORMACION DE PUBLICACION ---\n");
-        printf("Ano de publicacion: ");
-        scanf("%d", &coleccion[*totalLibros].publicacion.año);
-        getchar();
-
-        printf("Editorial: ");
-        fgets(coleccion[*totalLibros].publicacion.editorial, sizeof(coleccion[*totalLibros].publicacion.editorial), stdin);
-        strtok(coleccion[*totalLibros].publicacion.editorial, "\n");
-
-        printf("Ciudad de publicacion: ");
-        fgets(coleccion[*totalLibros].publicacion.ciudad, sizeof(coleccion[*totalLibros].publicacion.ciudad), stdin);
-        strtok(coleccion[*totalLibros].publicacion.ciudad, "\n");
-
-        printf("Pais de publicacion: ");
-        fgets(coleccion[*totalLibros].publicacion.pais, sizeof(coleccion[*totalLibros].publicacion.pais), stdin);
-        strtok(coleccion[*totalLibros].publicacion.pais, "\n");
-
-        printf("Numero de edicion: ");
-        scanf("%d", &coleccion[*totalLibros].publicacion.numeroEdicion);
-        getchar();
-
-        printf("\n--- CATEGORIZACION ---\n");
-        printf("Genero: ");
-        fgets(coleccion[*totalLibros].categoria.genero, sizeof(coleccion[*totalLibros].categoria.genero), stdin);
-        strtok(coleccion[*totalLibros].categoria.genero, "\n");
-
-        printf("Categoria: ");
-        fgets(coleccion[*totalLibros].categoria.categoria, sizeof(coleccion[*totalLibros].categoria.categoria), stdin);
-        strtok(coleccion[*totalLibros].categoria.categoria, "\n");
-
-        printf("Subcategoria: ");
-        fgets(coleccion[*totalLibros].categoria.subcategoria, sizeof(coleccion[*totalLibros].categoria.subcategoria), stdin);
-        strtok(coleccion[*totalLibros].categoria.subcategoria, "\n");
-
-        printf("Clasificacion por edad: 0=infantil, 1=juvenil, 2=adulto: ");
-        scanf("%d", &coleccion[*totalLibros].categoria.clasificacionEdad);
-        getchar();
+            if (validarCadenaVacia(coleccion[*totalLibros].autor.nombreCompleto) == 0)
+            {
+                printf("Error: El nombre del autor no puede estar vacio.\n");
+            }
+            else
+            {
+                autorValido = 1;
+            }
+        }
 
         coleccion[*totalLibros].estado.disponible = 1;
         strcpy(coleccion[*totalLibros].estado.fechaPrestamo, "N/A");
@@ -144,7 +192,7 @@ void registrarLibros(DatosLibroAnidado coleccion[], int *totalLibros)
     }
 }
 
-void listaLibros(DatosLibroAnidado coleccion[], int totalLibros)
+void listaLibros(struct DatosLibroAnidado coleccion[], int totalLibros)
 {
     if (totalLibros <= 0)
     {
@@ -159,29 +207,11 @@ void listaLibros(DatosLibroAnidado coleccion[], int totalLibros)
         printf("\n--- LIBRO #%d ---\n", i + 1);
         printf("ID: %s\n", coleccion[i].ID);
         printf("Titulo: %s\n", coleccion[i].titulo);
-        printf("Paginas: %d | Idioma: %s\n", coleccion[i].numeroPaginas, coleccion[i].idioma);
+        printf("Idioma: %s | Genero: %s\n", coleccion[i].idioma, coleccion[i].genero);
 
-        printf("Autor: %s %s de %s, %d anos\n",
-               coleccion[i].autor.nombre,
-               coleccion[i].autor.apellido,
-               coleccion[i].autor.nacionalidad,
-               coleccion[i].autor.edad);
+        printf("Autor: %s\n", coleccion[i].autor.nombreCompleto);
 
-        printf("Publicacion: %s en %d - %s, %s - Edicion #%d\n",
-               coleccion[i].publicacion.editorial,
-               coleccion[i].publicacion.año,
-               coleccion[i].publicacion.ciudad,
-               coleccion[i].publicacion.pais,
-               coleccion[i].publicacion.numeroEdicion);
-
-        const char *clasificaciones[] = {"Infantil", "Juvenil", "Adulto"};
-        printf("Categoria: %s > %s > %s - %s\n",
-               coleccion[i].categoria.genero,
-               coleccion[i].categoria.categoria,
-               coleccion[i].categoria.subcategoria,
-               clasificaciones[coleccion[i].categoria.clasificacionEdad]);
-
-        if (coleccion[i].estado.disponible)
+        if (coleccion[i].estado.disponible == 1)
         {
             printf("Estado: DISPONIBLE\n");
         }
@@ -198,7 +228,7 @@ void listaLibros(DatosLibroAnidado coleccion[], int totalLibros)
     }
 }
 
-void buscarLibro(DatosLibroAnidado coleccion[], int totalLibros)
+void buscarLibro(struct DatosLibroAnidado coleccion[], int totalLibros)
 {
     if (totalLibros <= 0)
     {
@@ -212,10 +242,23 @@ void buscarLibro(DatosLibroAnidado coleccion[], int totalLibros)
     printf("2. Buscar por ID\n");
     printf("3. Buscar por autor\n");
     printf("4. Buscar por genero\n");
-    printf("5. Buscar por editorial\n");
     printf("Seleccione una opcion: ");
 
-    if (scanf("%d", &opcion) != 1 || opcion < 1 || opcion > 5)
+    if (scanf("%d", &opcion) != 1)
+    {
+        printf("Opcion invalida.\n");
+        while (getchar() != '\n')
+            ;
+        return;
+    }
+    else if (opcion < 1)
+    {
+        printf("Opcion invalida.\n");
+        while (getchar() != '\n')
+            ;
+        return;
+    }
+    else if (opcion > 4)
     {
         printf("Opcion invalida.\n");
         while (getchar() != '\n')
@@ -226,13 +269,29 @@ void buscarLibro(DatosLibroAnidado coleccion[], int totalLibros)
 
     int encontrado = 0;
     char busqueda[100];
+    int busquedaValida = 0;
 
-    switch (opcion)
+    if (opcion == 1)
     {
-    case 1:
-        printf("Ingrese el titulo a buscar: ");
-        fgets(busqueda, sizeof(busqueda), stdin);
-        strtok(busqueda, "\n");
+        while (busquedaValida == 0)
+        {
+            printf("Ingrese el titulo a buscar: ");
+            fgets(busqueda, 100, stdin);
+            int len = strlen(busqueda);
+            if (len > 0 && busqueda[len - 1] == '\n')
+            {
+                busqueda[len - 1] = '\0';
+            }
+
+            if (validarCadenaVacia(busqueda) == 0)
+            {
+                printf("Error: La busqueda no puede estar vacia.\n");
+            }
+            else
+            {
+                busquedaValida = 1;
+            }
+        }
 
         for (int i = 0; i < totalLibros; i++)
         {
@@ -240,17 +299,40 @@ void buscarLibro(DatosLibroAnidado coleccion[], int totalLibros)
             {
                 printf("\n--- LIBRO ENCONTRADO ---\n");
                 printf("ID: %s | Titulo: %s\n", coleccion[i].ID, coleccion[i].titulo);
-                printf("Autor: %s %s\n", coleccion[i].autor.nombre, coleccion[i].autor.apellido);
-                printf("Estado: %s\n", coleccion[i].estado.disponible ? "Disponible" : "Prestado");
+                printf("Autor: %s\n", coleccion[i].autor.nombreCompleto);
+                if (coleccion[i].estado.disponible == 1)
+                {
+                    printf("Estado: Disponible\n");
+                }
+                else
+                {
+                    printf("Estado: Prestado\n");
+                }
                 encontrado = 1;
             }
         }
-        break;
+    }
+    else if (opcion == 2)
+    {
+        while (busquedaValida == 0)
+        {
+            printf("Ingrese el ID a buscar: ");
+            fgets(busqueda, 100, stdin);
+            int len = strlen(busqueda);
+            if (len > 0 && busqueda[len - 1] == '\n')
+            {
+                busqueda[len - 1] = '\0';
+            }
 
-    case 2:
-        printf("Ingrese el ID a buscar: ");
-        fgets(busqueda, sizeof(busqueda), stdin);
-        strtok(busqueda, "\n");
+            if (validarCadenaVacia(busqueda) == 0)
+            {
+                printf("Error: La busqueda no puede estar vacia.\n");
+            }
+            else
+            {
+                busquedaValida = 1;
+            }
+        }
 
         for (int i = 0; i < totalLibros; i++)
         {
@@ -258,77 +340,110 @@ void buscarLibro(DatosLibroAnidado coleccion[], int totalLibros)
             {
                 printf("\n--- LIBRO ENCONTRADO ---\n");
                 printf("ID: %s | Titulo: %s\n", coleccion[i].ID, coleccion[i].titulo);
-                printf("Autor: %s %s\n", coleccion[i].autor.nombre, coleccion[i].autor.apellido);
-                printf("Estado: %s\n", coleccion[i].estado.disponible ? "Disponible" : "Prestado");
+                printf("Autor: %s\n", coleccion[i].autor.nombreCompleto);
+                if (coleccion[i].estado.disponible == 1)
+                {
+                    printf("Estado: Disponible\n");
+                }
+                else
+                {
+                    printf("Estado: Prestado\n");
+                }
                 encontrado = 1;
                 break;
             }
         }
-        break;
+    }
+    else if (opcion == 3)
+    {
+        while (busquedaValida == 0)
+        {
+            printf("Ingrese el nombre del autor: ");
+            fgets(busqueda, 100, stdin);
+            int len = strlen(busqueda);
+            if (len > 0 && busqueda[len - 1] == '\n')
+            {
+                busqueda[len - 1] = '\0';
+            }
 
-    case 3:
-        printf("Ingrese el nombre o apellido del autor: ");
-        fgets(busqueda, sizeof(busqueda), stdin);
-        strtok(busqueda, "\n");
+            if (validarCadenaVacia(busqueda) == 0)
+            {
+                printf("Error: La busqueda no puede estar vacia.\n");
+            }
+            else
+            {
+                busquedaValida = 1;
+            }
+        }
 
         for (int i = 0; i < totalLibros; i++)
         {
-            if (strstr(coleccion[i].autor.nombre, busqueda) != 0 ||
-                strstr(coleccion[i].autor.apellido, busqueda) != 0)
+            if (strstr(coleccion[i].autor.nombreCompleto, busqueda) != 0)
             {
                 printf("\n--- LIBRO ENCONTRADO ---\n");
                 printf("ID: %s | Titulo: %s\n", coleccion[i].ID, coleccion[i].titulo);
-                printf("Autor: %s %s\n", coleccion[i].autor.nombre, coleccion[i].autor.apellido);
-                printf("Estado: %s\n", coleccion[i].estado.disponible ? "Disponible" : "Prestado");
+                printf("Autor: %s\n", coleccion[i].autor.nombreCompleto);
+                if (coleccion[i].estado.disponible == 1)
+                {
+                    printf("Estado: Disponible\n");
+                }
+                else
+                {
+                    printf("Estado: Prestado\n");
+                }
                 encontrado = 1;
             }
         }
-        break;
+    }
+    else if (opcion == 4)
+    {
+        while (busquedaValida == 0)
+        {
+            printf("Ingrese el genero a buscar: ");
+            fgets(busqueda, 100, stdin);
+            int len = strlen(busqueda);
+            if (len > 0 && busqueda[len - 1] == '\n')
+            {
+                busqueda[len - 1] = '\0';
+            }
 
-    case 4:
-        printf("Ingrese el genero a buscar: ");
-        fgets(busqueda, sizeof(busqueda), stdin);
-        strtok(busqueda, "\n");
+            if (validarCadenaVacia(busqueda) == 0)
+            {
+                printf("Error: La busqueda no puede estar vacia.\n");
+            }
+            else
+            {
+                busquedaValida = 1;
+            }
+        }
 
         for (int i = 0; i < totalLibros; i++)
         {
-            if (strstr(coleccion[i].categoria.genero, busqueda) != 0)
+            if (strstr(coleccion[i].genero, busqueda) != 0)
             {
                 printf("\n--- LIBRO ENCONTRADO ---\n");
                 printf("ID: %s | Titulo: %s\n", coleccion[i].ID, coleccion[i].titulo);
-                printf("Genero: %s\n", coleccion[i].categoria.genero);
-                printf("Estado: %s\n", coleccion[i].estado.disponible ? "Disponible" : "Prestado");
+                printf("Genero: %s\n", coleccion[i].genero);
+                if (coleccion[i].estado.disponible == 1)
+                {
+                    printf("Estado: Disponible\n");
+                }
+                else
+                {
+                    printf("Estado: Prestado\n");
+                }
                 encontrado = 1;
             }
         }
-        break;
-
-    case 5:
-        printf("Ingrese la editorial a buscar: ");
-        fgets(busqueda, sizeof(busqueda), stdin);
-        strtok(busqueda, "\n");
-
-        for (int i = 0; i < totalLibros; i++)
-        {
-            if (strstr(coleccion[i].publicacion.editorial, busqueda) != 0)
-            {
-                printf("\n--- LIBRO ENCONTRADO ---\n");
-                printf("ID: %s | Titulo: %s\n", coleccion[i].ID, coleccion[i].titulo);
-                printf("Editorial: %s en %d\n", coleccion[i].publicacion.editorial, coleccion[i].publicacion.año);
-                printf("Estado: %s\n", coleccion[i].estado.disponible ? "Disponible" : "Prestado");
-                encontrado = 1;
-            }
-        }
-        break;
     }
 
-    if (!encontrado)
+    if (encontrado == 0)
     {
         printf("No se encontraron libros con ese criterio de busqueda.\n");
     }
 }
 
-void actualizarEstadoLibro(DatosLibroAnidado coleccion[], int totalLibros)
+void actualizarEstadoLibro(struct DatosLibroAnidado coleccion[], int totalLibros)
 {
     if (totalLibros <= 0)
     {
@@ -337,35 +452,121 @@ void actualizarEstadoLibro(DatosLibroAnidado coleccion[], int totalLibros)
     }
 
     char idBuscar[MAX_ID];
-    printf("Ingrese el ID del libro para actualizar su estado: ");
-    getchar();
-    fgets(idBuscar, MAX_ID, stdin);
-    strtok(idBuscar, "\n");
+    int idValido = 0;
+    while (idValido == 0)
+    {
+        printf("Ingrese el ID del libro para actualizar su estado: ");
+        getchar();
+        fgets(idBuscar, MAX_ID, stdin);
+        int len = strlen(idBuscar);
+        if (len > 0 && idBuscar[len - 1] == '\n')
+        {
+            idBuscar[len - 1] = '\0';
+        }
+
+        if (validarCadenaVacia(idBuscar) == 0)
+        {
+            printf("Error: El ID no puede estar vacio.\n");
+        }
+        else
+        {
+            idValido = 1;
+        }
+    }
 
     for (int i = 0; i < totalLibros; i++)
     {
         if (strcmp(coleccion[i].ID, idBuscar) == 0)
         {
-            if (coleccion[i].estado.disponible)
+            if (coleccion[i].estado.disponible == 1)
             {
                 coleccion[i].estado.disponible = 0;
 
                 printf("--- REGISTRO DE PRESTAMO ---\n");
-                printf("Nombre del prestatario: ");
-                fgets(coleccion[i].estado.nombrePrestatario, sizeof(coleccion[i].estado.nombrePrestatario), stdin);
-                strtok(coleccion[i].estado.nombrePrestatario, "\n");
 
-                printf("Contacto del prestatario: ");
-                fgets(coleccion[i].estado.contactoPrestatario, sizeof(coleccion[i].estado.contactoPrestatario), stdin);
-                strtok(coleccion[i].estado.contactoPrestatario, "\n");
+                int nombreValido = 0;
+                while (nombreValido == 0)
+                {
+                    printf("Nombre del prestatario: ");
+                    fgets(coleccion[i].estado.nombrePrestatario, 50, stdin);
+                    int len = strlen(coleccion[i].estado.nombrePrestatario);
+                    if (len > 0 && coleccion[i].estado.nombrePrestatario[len - 1] == '\n')
+                    {
+                        coleccion[i].estado.nombrePrestatario[len - 1] = '\0';
+                    }
 
-                printf("Fecha de prestamo DD/MM/AAAA: ");
-                fgets(coleccion[i].estado.fechaPrestamo, sizeof(coleccion[i].estado.fechaPrestamo), stdin);
-                strtok(coleccion[i].estado.fechaPrestamo, "\n");
+                    if (validarCadenaVacia(coleccion[i].estado.nombrePrestatario) == 0)
+                    {
+                        printf("Error: El nombre del prestatario no puede estar vacio.\n");
+                    }
+                    else
+                    {
+                        nombreValido = 1;
+                    }
+                }
 
-                printf("Fecha de devolucion estimada DD/MM/AAAA: ");
-                fgets(coleccion[i].estado.fechaDevolucion, sizeof(coleccion[i].estado.fechaDevolucion), stdin);
-                strtok(coleccion[i].estado.fechaDevolucion, "\n");
+                int contactoValido = 0;
+                while (contactoValido == 0)
+                {
+                    printf("Contacto del prestatario: ");
+                    fgets(coleccion[i].estado.contactoPrestatario, 50, stdin);
+                    int len = strlen(coleccion[i].estado.contactoPrestatario);
+                    if (len > 0 && coleccion[i].estado.contactoPrestatario[len - 1] == '\n')
+                    {
+                        coleccion[i].estado.contactoPrestatario[len - 1] = '\0';
+                    }
+
+                    if (validarCadenaVacia(coleccion[i].estado.contactoPrestatario) == 0)
+                    {
+                        printf("Error: El contacto del prestatario no puede estar vacio.\n");
+                    }
+                    else
+                    {
+                        contactoValido = 1;
+                    }
+                }
+
+                int fechaPrestamoValida = 0;
+                while (fechaPrestamoValida == 0)
+                {
+                    printf("Fecha de prestamo DD/MM/AAAA: ");
+                    fgets(coleccion[i].estado.fechaPrestamo, 20, stdin);
+                    int len = strlen(coleccion[i].estado.fechaPrestamo);
+                    if (len > 0 && coleccion[i].estado.fechaPrestamo[len - 1] == '\n')
+                    {
+                        coleccion[i].estado.fechaPrestamo[len - 1] = '\0';
+                    }
+
+                    if (validarCadenaVacia(coleccion[i].estado.fechaPrestamo) == 0)
+                    {
+                        printf("Error: La fecha de prestamo no puede estar vacia.\n");
+                    }
+                    else
+                    {
+                        fechaPrestamoValida = 1;
+                    }
+                }
+
+                int fechaDevolucionValida = 0;
+                while (fechaDevolucionValida == 0)
+                {
+                    printf("Fecha de devolucion estimada DD/MM/AAAA: ");
+                    fgets(coleccion[i].estado.fechaDevolucion, 20, stdin);
+                    int len = strlen(coleccion[i].estado.fechaDevolucion);
+                    if (len > 0 && coleccion[i].estado.fechaDevolucion[len - 1] == '\n')
+                    {
+                        coleccion[i].estado.fechaDevolucion[len - 1] = '\0';
+                    }
+
+                    if (validarCadenaVacia(coleccion[i].estado.fechaDevolucion) == 0)
+                    {
+                        printf("Error: La fecha de devolucion no puede estar vacia.\n");
+                    }
+                    else
+                    {
+                        fechaDevolucionValida = 1;
+                    }
+                }
 
                 printf("Estado del libro actualizado a: PRESTADO\n");
             }
@@ -385,7 +586,7 @@ void actualizarEstadoLibro(DatosLibroAnidado coleccion[], int totalLibros)
     printf("Libro no encontrado.\n");
 }
 
-void eliminarLibro(DatosLibroAnidado coleccion[], int *totalLibros, int indice)
+void eliminarLibro(struct DatosLibroAnidado coleccion[], int *totalLibros, int indice)
 {
     if (*totalLibros <= 0)
     {
@@ -393,7 +594,12 @@ void eliminarLibro(DatosLibroAnidado coleccion[], int *totalLibros, int indice)
         return;
     }
 
-    if (indice < 0 || indice >= *totalLibros)
+    if (indice < 0)
+    {
+        printf("Indice invalido.\n");
+        return;
+    }
+    else if (indice >= *totalLibros)
     {
         printf("Indice invalido.\n");
         return;
